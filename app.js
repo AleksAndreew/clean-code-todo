@@ -1,20 +1,20 @@
 const taskInput = document.getElementById('new-task'); //Add a new task.
 const addButton = document.getElementsByTagName('button')[0]; //first button
-const incompleteTaskHolder = document.getElementById('incompleteTasks'); //ul of #incompleteTasks
+const incompleteTaskHolder = document.getElementById('incomplete-tasks'); //ul of #incomplete-tasks
 const completedTasksHolder = document.getElementById('completed-tasks'); //completed-tasks
 
 //Create new task list item
 const createNewTaskElement = function (taskString) {
   const listItem = document.createElement('li');
   const checkBox = document.createElement('input');
-  const label = document.createElement('label');
+  const taskLabel = document.createElement('label');
   const editInput = document.createElement('input');
   const editButton = document.createElement('button');
   const deleteButton = document.createElement('button');
   const deleteButtonImg = document.createElement('img');
 
-  label.innerText = taskString;
-  label.className = 'task';
+  taskLabel.innerText = taskString;
+  taskLabel.className = 'task';
 
   checkBox.type = 'checkbox';
 
@@ -28,7 +28,7 @@ const createNewTaskElement = function (taskString) {
   deleteButton.appendChild(deleteButtonImg);
 
   listItem.appendChild(checkBox);
-  listItem.appendChild(label);
+  listItem.appendChild(taskLabel);
   listItem.appendChild(editInput);
   listItem.appendChild(editButton);
   listItem.appendChild(deleteButton);
@@ -40,7 +40,7 @@ const addTask = function () {
   if (!taskInput.value) return;
   const listItem = createNewTaskElement(taskInput.value);
   incompleteTaskHolder.appendChild(listItem);
-  bindTaskEvents(listItem, taskCompleted);
+  bindTaskEvents(listItem, moveTaskToCompleted);
   taskInput.value = '';
 };
 
@@ -50,7 +50,7 @@ const editTask = function () {
   const editInput = listItem.querySelector('input[type=text]');
   const label = listItem.querySelector('label');
   const editBtn = listItem.querySelector('.edit');
-  const containsClass = listItem.classList.contains('editMode');
+  const containsClass = listItem.classList.contains('edit-mode');
   if (containsClass) {
     label.innerText = editInput.value;
     editBtn.innerText = 'Edit';
@@ -58,28 +58,28 @@ const editTask = function () {
     editInput.value = label.innerText;
     editBtn.innerText = 'Save';
   }
-  listItem.classList.toggle('editMode');
+  listItem.classList.toggle('edit-mode');
 };
 
 //Delete task.
 const deleteTask = function () {
   const listItem = this.parentNode;
-  const ul = listItem.parentNode;
-  ul.removeChild(listItem);
+  const taskList = listItem.parentNode;
+  taskList.removeChild(listItem);
 };
 
 //Move task to the completed list
-const taskCompleted = function () {
+const moveTaskToCompleted = function () {
   const listItem = this.parentNode;
   completedTasksHolder.appendChild(listItem);
-  bindTaskEvents(listItem, taskIncomplete);
+  bindTaskEvents(listItem, moveTaskToIncomplete);
 };
 
-//Append the task list item to the #incompleteTasks.
-const taskIncomplete = function () {
+//Append the task list item to the #incomplete-tasks.
+const moveTaskToIncomplete = function () {
   const listItem = this.parentNode;
   incompleteTaskHolder.appendChild(listItem);
-  bindTaskEvents(listItem, taskCompleted);
+  bindTaskEvents(listItem, moveTaskToCompleted);
 };
 
 // Adds a task when the Add button is clicked
@@ -98,10 +98,10 @@ const bindTaskEvents = function (taskListItem, checkBoxEventHandler) {
 
 // Incomplete tasks should move to completed when checked
 for (let i = 0; i < incompleteTaskHolder.children.length; i++) {
-  bindTaskEvents(incompleteTaskHolder.children[i], taskCompleted);
+  bindTaskEvents(incompleteTaskHolder.children[i], moveTaskToCompleted);
 }
 
 // Completed tasks should move back to incomplete when unchecked
 for (let i = 0; i < completedTasksHolder.children.length; i++) {
-  bindTaskEvents(completedTasksHolder.children[i], taskIncomplete);
+  bindTaskEvents(completedTasksHolder.children[i], moveTaskToIncomplete);
 }
